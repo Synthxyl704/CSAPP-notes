@@ -32,4 +32,27 @@ SIMD parallelism {
     some compilers (GCC) automatically optimize to SIMD
     the processor/CPU has special vector registers that can for exg - 256 bit register holds 8 32-bit nums (an SI will add all those in vector registers in parallel)
     the CPU/processor has dedicated vector execution units, aka SIMD units
+    "The vector ALU performs operations in one single clock cycle"
+    intel processors/CPUs support SIMD through SSE, AVX, AVX-512
+
+    SSE {
+        Streaming SIMD Extensions (~1999)
+        uses XMM registers (128-bit vector registers)
+    }
+
+    AVX {
+        Advanced vector Extensions (~2011)
+        Uses YMM registers (256-bit vector registers)
+        doubling SSE width in total 
+    }
+
+    AVX-512 {
+        Advanced vector Extensions - 512 bit version (~2013)
+        uses ZMM registers (512-bit vector registers)
+        doubling vanilla AVX width
+    }
+
+    other subsets include AVX2, AVX-512VL, AVX-10
 }
+
+An SIMD vector ALU operates on these special vector registers apparently 
