@@ -1,0 +1,35 @@
+multiple programs execute at the same time - aka concurrency (existed since 1960s btw)
+traditionally in uniprocessor (monoprocessor/single processor) system, the single core simulated fake concurrency by rapid context switching
+
+multiple processors under a single OS = multiprocessing system (1980s)
+multi-core processors have several CPUs (aka "cores") integrated on a single IC chip
+
+Processors/CPUs {
+    uniprocessor - mostly outdated, still used in simple/embedded systems
+    multiprocessor {
+        multi-core,
+        hyperthreaded - single (CPU) core acts as two virtual cores at a time, CPU scheduler sends 2 sets of instructions to the same cores 4
+                      - AMD has SMTs (Simultaneous multi threading) (i think its just the synonym for hyperthreading)
+                      - remind you again, the "2 set of instructions" are just multiple bistable multivibrators working in harmony to change bits or 1/0sright ultimately to that target ISA
+                      - CPU does this by duplicating some parts for each thread like PC/IPs and register files
+                      - the ALU is shared among the threads 
+    }
+}
+
+1 core system = 2 threads
+...
+4 core system = 8 threads 
+5 core system = 10 threads 
+
+instruction level parallelism - a processor/CPU can work on >1 instructions at a time 
+                              - the processor "figures" out which part of the program can be executed concurrently without delay
+                              - it sends "those" identified instructions down to different execution units 
+                              - pipelines + superscalar execution (multiple exec units) + out-of-order exec (reordering of instructions) + speculative exec (guesses which instructions next?)
+
+SIMD parallelism {
+    Single instruction, multiple data
+    single instruction = conducts multiple operations
+    some compilers (GCC) automatically optimize to SIMD
+    the processor/CPU has special vector registers that can for exg - 256 bit register holds 8 32-bit nums (an SI will add all those in vector registers in parallel)
+    the CPU/processor has dedicated vector execution units, aka SIMD units
+}
