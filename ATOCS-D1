@@ -1,0 +1,214 @@
+A low level language is standard to its hardware proximity and how little abstraction it provides from m/c code.
+- direct access to main memory/(D)RAM 
+- registers access/RwX
+- minimal runtime overhead
+- lack of type safety, memory safety, auto mem management
+
+int_8t, int_32t, etc. they are just compiler level abstractions which help write portable code across CPUs with different ISAs
+
+--------------------------------------------------------
+
+Registers are just hardwired parts of silicon transistors into the CPU chip, basicly just micropic transistor circuits (not entirely wrong, but very abstracted)
+
+the transistor doesnt store the data, its just a switch/amplifier/gate which collectively with other transistors store bits
+
+flip-flops are "bistable multivibrators" {
+    multivibrators = electronic circuit for simple memory implementation/oscillator functions
+    bistable = dual state, here 0s 1s in the form of high voltage/low voltage
+}
+
+Input (D) → [ Flip-Flop ] → Output (Q)
+             ^
+             |
+           Clock
+
+Input (D) = data input (0/1)
+Flip-Flop = the storge elment whichs stores the 0/1
+Clock = a timing signal (idrk), a square wave elec signal of some sort that oscillates b/w high/low voltage, controls when the flip-flop updates its output 
+Output (Q) = The current stored value at that moment
+
+4-6 transistors store a single flip-flop/bistable multivibrators
+
+each bit is a flip-flop, so 8/16/32/64 bits are just those amounts of transistors
+8bit = 8 bistable multivibrators/flip-flops
+32bit = 32 bistable multivibrators/flip-flops
+64bit = 64 bistable multivibrators/flip-flops
+
+transistor is just a tiny elec switch, can be ON/OFF based on input voltage
+
+---------------------------------------------------------
+
+All the source code you write gets assembles/compiled to m/c code or binary code of your CPU's ISA (x86/x64, ARM, etc)
+The CPU just executes the instructions stored in D/RAM/main memory
+the CPU augments the ALU to perform the arithmetic instructional executions in/to binary, the result is extracted to relevant memory registers 
+
+these registers have fixed sizes (computer/sys parameters for storage lmao (8/16/32/64-bit)
+
+when machine code/binary runs, it reads data from these registers, calls the ALU for arithmetic operations as required, and rewrites the results back to those registers
+
+CPU > RAM > Disk
+
+
+common registers: 
+GPRs - General Purpose Registers (for arithmetic, logic, data movement (think EAX, EBX, ECX, EDX, RAX etc))
+PCs/IPs 
+SPs
+FRs (Flag registers/Status registers (SRs))
+IRs 
+BP/FP
+
+(x64 is aka AMD64)
+
+-------------------
+
+PCs (Program counters in ARM/RISC-V/MIPs) or IPs (Instruction Pointers in AMD/x86/x64) - special register that holds/points to the mem address of the next instruction to be executed. when the CPU execs one inst, it looks at the PC for the next instruction 
+IP - 16 bit ptr 
+EIP - Extended 32 bit ptr 
+RIP - 64 bit ptr (x86-64/AMD64 uses this, its R because its consistent with the RDX/RCX/RAX/64bit registers in asm)
+
+
++------------------------+
+|   CPU Core             |
+|                        |
+|  [ PC / IP ] ---> Ptr to next instruction
+|  [ SP ]      ---> Ptr to the top of the stack
+|  [ FR / SR ] ---> Result of last op
+|  [ BP / FP]  ---> References the parameters passed/local variables
+|  [ IR ]      ---> Current instruction
+|  [ GPRs ]    ---> Working data (int a, rax 1000, c something)
+|                        |
++------------------------+
+
+-------------------
+
+Stack Pointers (SPs) {
+    theres this stack thing in memory (mem stack) which (is a region that) stores the func calls(), local variables, paremeters and return addresses, etc.
+    apparently this stack moves DOWNWARDS (0x1000 -> 0x1004 -> 0x1008), starts are higher mem addrs and moves to lower
+}
+
+-------------------
+
+Flag Registers/Status registers (FRs/SRs) {
+    special registers that store results of certain operations, like comparisons or byte-arithmetic
+    mainly influence conditionals/if/else/while/shit/etc aka decision making 
+    eg CMP, JO, etc
+}
+
+------------------- 
+
+IRs (Instruction registers) {
+    holds the actual instruction being decoded/interpreted/executed
+}
+
+-------------------
+
+BP(Base ptr)/FP (Frame ptr) {
+    just a reference frame ptr for referencing the function parameters/local vars for easier computation
+}
+
+-------------------
+
+CPU -> PC -> interprets bits -> executes those bits -> looks again at the PC for the cyclic process to restart (these instructions may not be contiguously stored like in a linear array)
+these instructins are usually very small in amount, and hey revolve around the main memory/RAM, register file, and the ALU (the ALU computes the data and values arithmetically as mentioned prior)
+these instructions include {
+    Load - overwriting previous contents of the register to that register itself (in-place) 
+    store - writes the streamed data of that register to main memory
+    Operate - takes 1/>1 streamed data from registers to the ALU, performs arithmetic on the 2 and stores the data to a register again
+    Jump - extracts stream from the instruction itself and copies it to the PC mem address to tell the PC to continue exec from there
+}
+
+g++ iso.cpp -o iso {
+    g++ is the compiler for cpp
+    -> preprocessing: #include and shit validating shit 
+    -> preprocessed src code is compiled to an object file [xxxx.o]
+    -> the linker takes the object file, validates libraries and headers used
+    -> produces the final executable (Which you execute by ./xxxx or something) 
+}
+
+working {
+    -> ./progName (Main enter: 0x1C + 0x9C (Scan codes) -> translates it into ASCII/unicode)
+    -> reads each character and stores it to memory
+    -> the shell loads the executable by loading instructions in the object file from disk to memory 
+    -> these instructions will hold the syscalls, prompts and printing shit
+    -> using a technique called DMA, data travels from disk -> memory without prompting the CPU for anything
+    -> once loaded, the program will start executing the m/c instructions in the executable 
+    -> these instructions will be executed from memory to the "register file" -> display service -> you see shit on screen
+}
+
+register file != main memory/RAM 
+what exactly is the register file then?
+
+----------------------------------------
+
+
+High memory addresses
+------------------------
+|                      |
+|        Stack         |  <-- Grows **downward (to lower addresses)
+|                      |
+|----------------------|
+|                      |
+|      Free space      |
+|                      |
+|----------------------|
+|                      |
+|        Heap          |  <-- Grows **upward (to higher addresses)
+|                      |
+------------------------
+Low memory addresses
+
+heap memory grows upwards in the direction against the stack frames memory
+as long as the 2 pointers dont collide, this means theres memory available for pushing!
+idk about this though since the OS has its stack frame size set predeterminately
+Stack:  0x10000, 0x0FFFC, 0x0FFF8  (managed by CPU/OS)
+Heap:   0x01000, 0x01004, 0x01008  (managed by programmer/user (malloc and shit))
+
+(fig 1.13 in CSAPP)
+if the stack somehow grows so much that it meets the heap pointer, you get collision/memory corruption (really?)
+most modern OSes put gaurd pages b/w stack and heap (shared lib space?), special mem pages that cause access violation errors if traversed through/accessed
+
+--------------------------------------------
+
+CPU improvements grew faster with higher clock speeds, instructions parallelism and shit, but memory manufacturers prioritized capacity/efficienct, thus it fell behind and now the CPU since fast as fuck now waits for the slow ass main memory to give it some data to interpret, and this will keep widening
+
+(write an OS that allows application programs to interact directly with the kernal virtual address space lmao instead of invoking syscalls (should be 110% safe))
+
+sequential array of bytes together conduct the formation of a file (just a stream?)
+
+amhdahls law 
+
+
+--------------------------------
+
+context switch, virtual memory, kernel virtual memory
+
+
++-------------------+       Virtual Address      +------------------------+
+|                   |  ----------------------->  |                        |
+|   CPU (Processor)  |                           |  Memory Management     |
+|                   |                            |  Unit (MMU) + OS       |
++-------------------+                            |  Page Table            |
+                                                 +------------------------+
+                                                          |
+                                                          | Physical Address
+                                                          v
++-------------------+                          +-----------------------+
+|                   |                          |                       |
+|      RAM          | <----------------------> |         Disk          |
+|  (Fast memory)    |      (if)  Page Fault    |   (Slower storage)    |
+|                   |                          |                       |
++-------------------+                          +-----------------------+
+
+the CPU/Processor generates a new virtual address when a program runs (does not directly point to physical RAM)
+the MMU translates virtual address to a physical address in RAM using a struct called "Page Table"
+if data is already in RAM (page hit), the CPU/processor RWXs directly
+if not already in RAM (page fault), the OS loads the page from disk (where virtual memory pages are stored) to RAM 
+
+-> CPU issues a virtual address.
+-> MMU checks the page table:
+    - If page is in RAM → translate to physical address → access RAM.
+    - If page missing → page fault → OS loads the page from disk → updates page table → retry.
+-> RAM stores “active” pages for fast access.
+-> Disk stores all virtual memory, including parts not currently needed.
+
+---------------------------------------------------
