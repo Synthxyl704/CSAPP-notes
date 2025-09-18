@@ -1,3 +1,5 @@
+ATOCS-D1 + Hardware
+
 A low level language is standard to its hardware proximity and how little abstraction it provides from m/c code.
 - direct access to main memory/(D)RAM 
 - registers access/RwX
